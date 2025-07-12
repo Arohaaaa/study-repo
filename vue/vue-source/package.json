@@ -12,6 +12,7 @@
   "devDependencies": {
     "@babel/core": "^7.28.0",
     "@babel/preset-env": "^7.28.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
     "rollup": "^2.79.2",
     "rollup-plugin-babel": "^4.4.0"
   }

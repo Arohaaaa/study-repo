@@ -1,4 +1,5 @@
 import babel from "rollup-plugin-babel";
+import nodeResolve from "@rollup/plugin-node-resolve";
 
 export default {
   // 入口
@@ -18,5 +19,6 @@ export default {
     babel({
       exclude: "node_modules/**",
     }),
+    nodeResolve(),
   ],
 };
