@@ -1,3 +1,4 @@
+import { compileToFunction } from "./compile";
 import { initState } from "./state";
 
 export function initMixin(Vue) {
@@ -7,5 +8,29 @@ export function initMixin(Vue) {
     vm.$options = options;
     // 初始化状态
     initState(vm);
+
+    if (options.el) {
+      vm.$mount(options.el);
+    }
+  };
+
+  Vue.prototype.$mount = function (el) {
+    const vm = this;
+    const opts = vm.$options;
+    el = document.querySelector(el);
+
+    if (!opts.render) {
+      let template;
+      if (opts.template) {
+        template = opts.template;
+      } else if (el) {
+        template = el.outerHTML;
+      }
+
+      if (template) {
+        const render = compileToFunction(template);
+        opts.render = render;
+      }
+    }
   };
 }
