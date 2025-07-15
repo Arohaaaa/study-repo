@@ -1,3 +1,6 @@
+import { parseHTML } from "./parse";
+
 export function compileToFunction(template) {
-  console.log(template);
+  // 1、将template转化成ast语法树
+  let ast = parseHTML(template);
 }
