@@ -8,7 +8,6 @@ const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`);
 const attribute =
   /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/;
 const startTagClose = /^\s*(\/?)>/; // 匹配开始标签的结束部分，例开始标签为<div>，则结束部分就是>，开始标签为<div />，结束部分就是/>
-const defaultTagRE = /\{\{((?:.|\r?\n)+?)\}\}/g; // 匹配{{}}
 
 /**
  * 从头对html进行解析，解析完一部分就把解析完的部分删除，直到html全部被解析完。例：
