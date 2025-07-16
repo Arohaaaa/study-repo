@@ -54,7 +54,7 @@ export function parseHTML(html) {
   }
 
   function chars(text) {
-    text = text.replace(/\s/g, "");
+    text = text.trim();
     // 如果遇到文本，则直接放到当前节点的children中
     if (text) {
       currentParent.children.push({
