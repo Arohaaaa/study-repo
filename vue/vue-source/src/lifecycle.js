@@ -1,3 +1,4 @@
+import Watcher from "./observe/watcher";
 import { createElementVNode, createTextVNode } from "./vdom";
 
 function createElm(vnode) {
@@ -77,7 +78,11 @@ export function initLifeCycle(Vue) {
 export function mountComponent(vm, el) {
   vm.$el = el;
   // 1、调用render方法产生虚拟节点
-  vm._update(vm._render());
+  const updateComponent = () => {
+    vm._update(vm._render());
+  };
+  const watcher = new Watcher(vm, updateComponent, true);
+
   // 2、根据虚拟DOM产生真实DOM
   // 3、插入到el元素中
 }

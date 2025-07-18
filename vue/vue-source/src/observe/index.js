@@ -1,4 +1,5 @@
 import { newArrayProto } from "./array";
+import Dep from "./dep";
 
 class Observer {
   constructor(data) {
@@ -31,8 +32,12 @@ class Observer {
 function defineReactive(data, key, value) {
   // 如果值也是个对象，则继续往下劫持
   observe(value);
+  let dep = new Dep();
   Object.defineProperty(data, key, {
     get() {
+      if (Dep.target) {
+        dep.depend();
+      }
       return value;
     },
     set(newValue) {
@@ -43,6 +48,7 @@ function defineReactive(data, key, value) {
       // 设置的新值也是个对象时，继续往下劫持
       observe(value);
       value = newValue;
+      dep.notify();
     },
   });
 }
