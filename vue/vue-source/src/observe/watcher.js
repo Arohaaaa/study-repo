@@ -31,7 +31,53 @@ class Watcher {
   }
 
   update() {
+    queueWatcher(this);
+  }
+
+  run() {
     this.get();
+  }
+}
+
+let queue = [];
+let has = {};
+let pending = false;
+
+function flushSchedulerQueue() {
+  let flushQueue = queue.slice(0);
+  queue = [];
+  has = {};
+  pending = false;
+  flushQueue.forEach((q) => q.run());
+}
+
+function queueWatcher(watcher) {
+  const id = watcher.id;
+  if (!has[id]) {
+    queue.push(watcher);
+    has[id] = true;
+    if (!pending) {
+      nextTick(flushSchedulerQueue);
+      pending = true;
+    }
+  }
+}
+
+let callbacks = [];
+let waiting = false;
+function flushCallbacks() {
+  let cbs = callbacks.slice(0);
+  waiting = false;
+  callbacks = [];
+  cbs.forEach((cb) => cb());
+}
+export function nextTick(cb) {
+  callbacks.push(cb);
+  if (!waiting) {
+    setTimeout(() => {
+      flushCallbacks();
+    }, 0);
+    waiting = true;
   }
 }
 
