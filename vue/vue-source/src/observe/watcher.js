@@ -1,4 +1,4 @@
-import Dep from "./dep";
+import Dep, { popTarget, pushTarget } from "./dep";
 
 let id = 0;
 
@@ -10,7 +10,13 @@ class Watcher {
     this.getter = fn;
     this.deps = [];
     this.depsId = new Set();
-    this.get();
+    this.lazy = options.lazy;
+    this.dirty = this.lazy;
+    this.vm = vm;
+
+    if (!this.lazy) {
+      this.get();
+    }
   }
 
   addDep(dep) {
@@ -22,16 +28,36 @@ class Watcher {
     }
   }
 
+  evaluate() {
+    // 获取到用户函数的返回值，并把dirty标识设置为false
+    this.value = this.get();
+    this.dirty = false;
+  }
+
   get() {
-    Dep.target = this;
+    pushTarget(this);
     // getter方法即对应着vm._update(vm._render())方法，调用后会去vm上取值，从而触发响应式数据的getter方法，
-    this.getter();
+    let value = this.getter.call(this.vm);
     // 渲染完毕后清空
-    Dep.target = null;
+    popTarget();
+    return value;
+  }
+
+  depend() {
+    let i = this.deps.length;
+    while (i--) {
+      // 让计算属性watcher也收集渲染watcher
+      this.deps[i].depend();
+    }
   }
 
   update() {
-    queueWatcher(this);
+    if (this.lazy) {
+      // 如果是计算属性，依赖的值变化了，就标识计算属性是脏值了
+      this.dirty = true;
+    } else {
+      queueWatcher(this);
+    }
   }
 
   run() {

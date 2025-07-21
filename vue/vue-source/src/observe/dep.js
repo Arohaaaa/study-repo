@@ -24,4 +24,14 @@ class Dep {
 // 在Dep上设置一个全局变量用于挂载watcher实例
 Dep.target = null;
 
+let stack = [];
+export function pushTarget(watcher) {
+  stack.push(watcher);
+  Dep.target = watcher;
+}
+export function popTarget() {
+  stack.pop();
+  Dep.target = stack[stack.length - 1];
+}
+
 export default Dep;
