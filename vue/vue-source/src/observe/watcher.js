@@ -71,12 +71,36 @@ function flushCallbacks() {
   callbacks = [];
   cbs.forEach((cb) => cb());
 }
+
+// 异步任务优雅降级
+let timerFunc;
+if (Promise) {
+  timerFunc = () => {
+    Promise.resolve().then(flushCallbacks);
+  };
+} else if (MutationObserver) {
+  let observe = new MutationObserver(flushCallbacks);
+  let textNode = document.createTextNode(1);
+  observe.observe(textNode, {
+    characterData: true,
+  });
+  timerFunc = () => {
+    textNode.textContent = 2;
+  };
+} else if (setImmediage) {
+  timerFunc = () => {
+    setImmediage(flushCallbacks);
+  };
+} else {
+  timerFunc = () => {
+    setTimeout(flushCallbacks);
+  };
+}
+
 export function nextTick(cb) {
   callbacks.push(cb);
   if (!waiting) {
-    setTimeout(() => {
-      flushCallbacks();
-    }, 0);
+    timerFunc(flushCallbacks);
     waiting = true;
   }
 }
