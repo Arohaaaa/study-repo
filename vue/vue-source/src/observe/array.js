@@ -38,6 +38,7 @@ methods.forEach((method) => {
       ob.observeArary(inserted);
     }
 
+    ob.dep.notify();
     return result;
   };
 });

@@ -3,6 +3,9 @@ import Dep from "./dep";
 
 class Observer {
   constructor(data) {
+    // 给每个对象增加收集依赖功能
+    this.dep = new Dep();
+
     // 给数据添加一个__ob__属性，指向Observer实例
     Object.defineProperty(data, "__ob__", {
       enumerable: false, // 不可枚举
@@ -29,14 +32,30 @@ class Observer {
   }
 }
 
+function dependArray(value) {
+  for (let i = 0; i < value.length; i++) {
+    let current = value[i];
+    current.__ob__ && current.__ob__.dep.depend();
+    if (Array.isArray(current)) {
+      dependArray(current);
+    }
+  }
+}
+
 function defineReactive(data, key, value) {
   // 如果值也是个对象，则继续往下劫持
-  observe(value);
+  let childOb = observe(value);
   let dep = new Dep();
   Object.defineProperty(data, key, {
     get() {
       if (Dep.target) {
         dep.depend();
+        if (childOb) {
+          childOb.dep.depend();
+          if (Array.isArray(value)) {
+            dependArray(value);
+          }
+        }
       }
       return value;
     },
