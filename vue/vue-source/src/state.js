@@ -1,6 +1,6 @@
 import { observe } from "./observe";
 import Dep from "./observe/dep";
-import Watcher from "./observe/watcher";
+import Watcher, { nextTick } from "./observe/watcher";
 
 export function initState(vm) {
   const opts = vm.$options;
@@ -9,6 +9,9 @@ export function initState(vm) {
   }
   if (opts.computed) {
     initComputed(vm);
+  }
+  if (opts.watch) {
+    initWatch(vm);
   }
 }
 
@@ -74,5 +77,44 @@ function createComputedGetter(key) {
       watcher.depend();
     }
     return watcher.value;
+  };
+}
+
+function initWatch(vm) {
+  let watch = vm.$options.watch;
+
+  for (let key in watch) {
+    const handler = watch[key];
+    if (Array.isArray(handler)) {
+      for (let i = 0; i < handler.length; i++) {
+        createWatcher(vm, key, handler[i]);
+      }
+    } else {
+      createWatcher(vm, key, handler);
+    }
+  }
+}
+
+function createWatcher(vm, key, handler) {
+  // handler可能是字符串、函数、对象
+  if (typeof handler === "string") {
+    handler = vm[handler];
+  }
+
+  return vm.$watch(key, handler);
+}
+
+export function initStateMixin(Vue) {
+  Vue.prototype.$nextTick = nextTick;
+
+  Vue.prototype.$watch = function (exprOrFn, cb, options = {}) {
+    new Watcher(
+      this,
+      exprOrFn,
+      {
+        user: true,
+      },
+      cb
+    );
   };
 }

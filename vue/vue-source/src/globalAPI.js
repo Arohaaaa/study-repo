@@ -1,6 +1,6 @@
 import { mergeOptions } from "./utils";
 
-export function initGLobalAPI(Vue) {
+export function initGlobalAPI(Vue) {
   Vue.options = {};
 
   Vue.mixin = function (mixin) {
